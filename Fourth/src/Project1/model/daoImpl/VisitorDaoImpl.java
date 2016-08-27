@@ -89,7 +89,7 @@ public class VisitorDaoImpl implements VisitorDao {
 
         } else {
             System.out.println("用户名或者密码输入错误，请重新输入");
-            login(name, password);
+
 
         }
 
