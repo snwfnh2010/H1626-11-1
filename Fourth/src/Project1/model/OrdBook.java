@@ -9,14 +9,16 @@ public class OrdBook implements Serializable {
     private int id;
     private int uid;
     private int bid;
+    private String ordTime;
 
     public OrdBook() {
     }
 
-    public OrdBook(int id, int uid, int bid) {
+    public OrdBook(int id, int uid, int bid, String ordTime) {
         this.id = id;
         this.uid = uid;
         this.bid = bid;
+        this.ordTime = ordTime;
     }
 
     public int getId() {
@@ -43,6 +45,14 @@ public class OrdBook implements Serializable {
         this.bid = bid;
     }
 
+    public String getOrdTime() {
+        return ordTime;
+    }
+
+    public void setOrdTime(String ordTime) {
+        this.ordTime = ordTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -52,7 +62,8 @@ public class OrdBook implements Serializable {
 
         if (id != ordBook.id) return false;
         if (uid != ordBook.uid) return false;
-        return bid == ordBook.bid;
+        if (bid != ordBook.bid) return false;
+        return ordTime != null ? ordTime.equals(ordBook.ordTime) : ordBook.ordTime == null;
 
     }
 
@@ -61,6 +72,7 @@ public class OrdBook implements Serializable {
         int result = id;
         result = 31 * result + uid;
         result = 31 * result + bid;
+        result = 31 * result + (ordTime != null ? ordTime.hashCode() : 0);
         return result;
     }
 
@@ -70,6 +82,7 @@ public class OrdBook implements Serializable {
                 "id=" + id +
                 ", uid=" + uid +
                 ", bid=" + bid +
+                ", ordTime='" + ordTime + '\'' +
                 '}';
     }
 }

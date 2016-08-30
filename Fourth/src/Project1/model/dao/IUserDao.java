@@ -13,5 +13,8 @@ public interface IUserDao {
     public boolean returnBook(String sql);
     public boolean ordBook(String sql);
     public boolean evaluate(String sql);
+    public boolean checkFrozen(int uid);
+    public boolean checkid(int bid, String str1, String str2);
+    public void showInfo(int useId);
 
 }

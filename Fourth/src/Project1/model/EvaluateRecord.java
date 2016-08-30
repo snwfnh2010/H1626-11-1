@@ -8,15 +8,17 @@ import java.io.Serializable;
 public class EvaluateRecord implements Serializable{
     private int id;
     private int uid;
+    private int bid;
     private String content;
     private String conTime;
 
     public EvaluateRecord() {
     }
 
-    public EvaluateRecord(int id, int uid, String content, String conTime) {
+    public EvaluateRecord(int id, int uid, int bid, String content, String conTime) {
         this.id = id;
         this.uid = uid;
+        this.bid = bid;
         this.content = content;
         this.conTime = conTime;
     }
@@ -35,6 +37,14 @@ public class EvaluateRecord implements Serializable{
 
     public void setUid(int uid) {
         this.uid = uid;
+    }
+
+    public int getBid() {
+        return bid;
+    }
+
+    public void setBid(int bid) {
+        this.bid = bid;
     }
 
     public String getContent() {
@@ -62,6 +72,7 @@ public class EvaluateRecord implements Serializable{
 
         if (id != that.id) return false;
         if (uid != that.uid) return false;
+        if (bid != that.bid) return false;
         if (content != null ? !content.equals(that.content) : that.content != null) return false;
         return conTime != null ? conTime.equals(that.conTime) : that.conTime == null;
 
@@ -71,6 +82,7 @@ public class EvaluateRecord implements Serializable{
     public int hashCode() {
         int result = id;
         result = 31 * result + uid;
+        result = 31 * result + bid;
         result = 31 * result + (content != null ? content.hashCode() : 0);
         result = 31 * result + (conTime != null ? conTime.hashCode() : 0);
         return result;
@@ -81,6 +93,7 @@ public class EvaluateRecord implements Serializable{
         return "EvaluateRecord{" +
                 "id=" + id +
                 ", uid=" + uid +
+                ", bid=" + bid +
                 ", content='" + content + '\'' +
                 ", conTime='" + conTime + '\'' +
                 '}';

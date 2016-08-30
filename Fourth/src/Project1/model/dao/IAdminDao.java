@@ -9,14 +9,14 @@ import java.util.List;
  * Created by snwfnh on 2016/8/25.
  */
 public interface IAdminDao  {
-    public boolean addBook(Book book);
-    public boolean updateBook(String sql);
-    public boolean deleteBook(int bookId);
-    public boolean addUser(String sql);
-    public boolean updateUser(String sql);
-    public boolean deleteUser(int userId);
-    public List<User> showUser();
-    public boolean frozeUser(User user);
+    public void addBook();
+    public void updateBook();
+    public void deleteBook ();
+    public void addUser();
+    public void updateUser();
+    public void deleteUser();
+    public void showUseInfo();
+    public void frozeUser();
 
 
 }
