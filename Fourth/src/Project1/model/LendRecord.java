@@ -9,16 +9,18 @@ public class LendRecord implements Serializable {
     private int id;
     private int uid;
     private int biid;
+    private int bid;
     private String lendTime;
     private String returnTime;
 
     public LendRecord() {
     }
 
-    public LendRecord(int id, int uid, int biid, String lendTime, String returnTime) {
+    public LendRecord(int id, int uid, int biid, int bid, String lendTime, String returnTime) {
         this.id = id;
         this.uid = uid;
         this.biid = biid;
+        this.bid = bid;
         this.lendTime = lendTime;
         this.returnTime = returnTime;
     }
@@ -47,6 +49,14 @@ public class LendRecord implements Serializable {
         this.biid = biid;
     }
 
+    public int getBid() {
+        return bid;
+    }
+
+    public void setBid(int bid) {
+        this.bid = bid;
+    }
+
     public String getLendTime() {
         return lendTime;
     }
@@ -73,6 +83,7 @@ public class LendRecord implements Serializable {
         if (id != that.id) return false;
         if (uid != that.uid) return false;
         if (biid != that.biid) return false;
+        if (bid != that.bid) return false;
         if (lendTime != null ? !lendTime.equals(that.lendTime) : that.lendTime != null) return false;
         return returnTime != null ? returnTime.equals(that.returnTime) : that.returnTime == null;
 
@@ -83,6 +94,7 @@ public class LendRecord implements Serializable {
         int result = id;
         result = 31 * result + uid;
         result = 31 * result + biid;
+        result = 31 * result + bid;
         result = 31 * result + (lendTime != null ? lendTime.hashCode() : 0);
         result = 31 * result + (returnTime != null ? returnTime.hashCode() : 0);
         return result;
@@ -94,6 +106,7 @@ public class LendRecord implements Serializable {
                 "id=" + id +
                 ", uid=" + uid +
                 ", biid=" + biid +
+                ", bid=" + bid +
                 ", lendTime='" + lendTime + '\'' +
                 ", returnTime='" + returnTime + '\'' +
                 '}';

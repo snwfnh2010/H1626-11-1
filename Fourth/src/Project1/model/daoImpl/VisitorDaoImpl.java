@@ -38,7 +38,7 @@ public class VisitorDaoImpl implements VisitorDao {
     }
 
     @Override
-    public List<Book> showBooks(){
+    public void showBooks()  {
         String sql=null;
         String string=null;
         System.out.println("请选择查看全部书或者根据书名来查找");
@@ -67,7 +67,6 @@ public class VisitorDaoImpl implements VisitorDao {
                 showBooks();
                 break;
         }
-
         try {
             mPreparedStatement = mConnection.prepareStatement(sql);
             mResultSet = mPreparedStatement.executeQuery();
@@ -75,25 +74,28 @@ public class VisitorDaoImpl implements VisitorDao {
             e.printStackTrace();
         }
         if (mResultSet == null)
-            return null;
+            System.out.println("查不到结果");
         try {
-            while (mResultSet.next()) {
-                Book book = new Book();
-                book.setId(mResultSet.getInt("id"));
-                book.setName(mResultSet.getString("name"));
-                book.setCount(mResultSet.getInt("count"));
-                book.setType(mResultSet.getString("type"));
-                book.setAuthor(mResultSet.getString("author"));
-                book.setDiscount(mResultSet.getInt("discount"));
-                book.setHasLended(mResultSet.getInt("haslended"));
-                bookList.add(book);
+           while (mResultSet.next()) {
+               List<Book> bookList1=new ArrayList<>();
+                Book mBook=new Book(mResultSet.getInt(1),mResultSet.getString(2),
+                        mResultSet.getInt(3),mResultSet.getString(4),mResultSet.getString(5),
+                        mResultSet.getInt(6),mResultSet.getInt(7));
+                bookList1.add(mBook);
+               for(Book book:bookList1)
+                   System.out.println(book);
+
             }
+
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return bookList;
+
+
 
     }
+
 
     @Override
     public User login() {
@@ -126,18 +128,15 @@ public class VisitorDaoImpl implements VisitorDao {
                 System.out.println("用户名或者密码输入错误，请重新输入");
             }else if(i==3){
                 System.out.println("请下次输入或者联系管理员");
+                System.out.println("请在90秒后重试");
                 try {
                     Thread.sleep(90000);
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
-
-
-
-
-
 
         return mUser;
     }

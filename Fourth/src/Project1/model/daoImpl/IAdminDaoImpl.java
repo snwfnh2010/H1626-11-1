@@ -42,14 +42,14 @@ public class IAdminDaoImpl implements IAdminDao {
         mScanner = new Scanner(System.in);
         mBook = new Book();
         mUser = new User();
-        mFrozeRecord=new FrozeRecord();
+        mFrozeRecord = new FrozeRecord();
         mLendRecord = new LendRecord();
-        mOrdBook=new OrdBook();
+        mOrdBook = new OrdBook();
         bookList = new ArrayList<>();
         userList = new ArrayList<>();
-        frozeList=new ArrayList<>();
-        lendList=new ArrayList<>();
-        ordList=new ArrayList<>();
+        frozeList = new ArrayList<>();
+        lendList = new ArrayList<>();
+        ordList = new ArrayList<>();
 
 
     }
@@ -149,12 +149,12 @@ public class IAdminDaoImpl implements IAdminDao {
     @Override
     public void deleteBook() {
         System.out.println("请输入要删除图书的id");
-        int bookId = mScanner.nextInt();
+        int biid = mScanner.nextInt();
 
-        String sql = "delete from book where id=?";
+        String sql = "delete from bookinfo where id=?";
         try {
             mPreparedStatement = mConnection.prepareStatement(sql);
-            mPreparedStatement.setInt(1, bookId);
+            mPreparedStatement.setInt(1, biid);
             resultCode = mPreparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -240,6 +240,7 @@ public class IAdminDaoImpl implements IAdminDao {
 
 
     }
+
     @Override
     public void showUseInfo() {
         System.out.println("请输入指令查看各种记录");
@@ -247,25 +248,34 @@ public class IAdminDaoImpl implements IAdminDao {
         System.out.println("*2* 查看用户预约记录");
         System.out.println("*3* 查看用户冻结记录");
         System.out.println("*4* 查看用户帐户");
+        System.out.println("*5* 返回主界面");
         int choose = mScanner.nextInt();
         switch (choose) {
             case 1:
-                sql = "select id, uid, biid, lendTime, returnTime from lendrecord ";
+                sql = "select id, uid, biid,bid, lendTime, returnTime from lendrecord ";
                 showLend(sql);
+                showUseInfo();
                 break;
             case 2:
                 sql = "select id, uid, bid, ordTime from ordbook ";
                 showOrd(sql);
+                showUseInfo();
                 break;
             case 3:
                 sql = "select id, uid, frozenTime, unfrozenTime from frozenrecord";
                 showfrozen(sql);
+                showUseInfo();
                 break;
             case 4:
                 sql = "select id, name, point, level from user ";
                 showUser(sql);
+                showUseInfo();
+                break;
+            case 5:
                 break;
             default:
+                System.out.println("指令输入错误，请重新输入");
+                showUseInfo();
                 break;
         }
 
@@ -280,24 +290,25 @@ public class IAdminDaoImpl implements IAdminDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if(mResultSet==null)
+        if (mResultSet == null)
             System.out.println("没有记录");
         try {
             while (mResultSet.next()) {
-                FrozeRecord froze=new FrozeRecord();
+                FrozeRecord froze = new FrozeRecord();
+                List<FrozeRecord> frozeList =new ArrayList<>();
                 froze.setId(mResultSet.getInt("id"));
                 froze.setUid(mResultSet.getInt("uid"));
                 froze.setFrozenTime(mResultSet.getString("frozenTime"));
                 froze.setUnfrozenTime(mResultSet.getString("unfrozenTime"));
                 frozeList.add(froze);
+                for (FrozeRecord frozen : frozeList)
+                    System.out.println(frozen);
             }
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
-        for (FrozeRecord frozen:frozeList)
-            System.out.println(frozen);
-    }
 
+    }
 
 
     public void showOrd(String sql) {
@@ -308,25 +319,25 @@ public class IAdminDaoImpl implements IAdminDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if(mResultSet==null)
+        if (mResultSet == null)
             System.out.println("没有记录");
         try {
-            while(mResultSet.next()) {
-                OrdBook ord=new OrdBook();
+            while (mResultSet.next()) {
+                OrdBook ord = new OrdBook();
+                List<OrdBook> ordList=new ArrayList<>();
                 ord.setId(mResultSet.getInt("id"));
                 ord.setBid(mResultSet.getInt("bid"));
                 ord.setUid(mResultSet.getInt("uid"));
                 ord.setOrdTime(mResultSet.getString("ordTime"));
                 ordList.add(ord);
+                for (OrdBook ord1 : ordList)
+                    System.out.println(ord1);
             }
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
-        for (OrdBook ord1:ordList)
-            System.out.println(ord1);
+
     }
-
-
 
 
     public void showLend(String sql) {
@@ -337,26 +348,28 @@ public class IAdminDaoImpl implements IAdminDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if(mResultSet==null)
+        if (mResultSet == null)
             System.out.println("没有记录");
         try {
             while (mResultSet.next()) {
-                LendRecord lend=new LendRecord();
+                LendRecord lend = new LendRecord();
+                List<LendRecord> lendList =new ArrayList<>();
                 lend.setId(mResultSet.getInt("id"));
                 lend.setUid(mResultSet.getInt("uid"));
                 lend.setBiid(mResultSet.getInt("biid"));
+                lend.setBiid(mResultSet.getInt("bid"));
                 lend.setLendTime(mResultSet.getString("lendTime"));
                 lend.setReturnTime(mResultSet.getString("returnTime"));
                 lendList.add(lend);
+                for (LendRecord lend1 : lendList)
+                    System.out.println(lend1);
 
             }
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
-        for (LendRecord lend1:lendList)
-            System.out.println(lend1);
-    }
 
+    }
 
 
     public void showUser(String sql) {
@@ -367,24 +380,25 @@ public class IAdminDaoImpl implements IAdminDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if(mResultSet==null)
+        if (mResultSet == null)
             System.out.println("没有记录");
         try {
             while (mResultSet.next()) {
-                User user=new User();
+                User user = new User();
+                List<User> userList=new ArrayList<>();
                 user.setId(mResultSet.getInt("id"));
                 user.setName(mResultSet.getString("name"));
                 user.setPoint(mResultSet.getInt("point"));
                 user.setLevel(mResultSet.getInt("level"));
                 userList.add(user);
+                for (User user1 : userList)
+                    System.out.println(user1);
             }
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
-        for (User user1:userList)
-            System.out.println(user1);
-    }
 
+    }
 
 
     @Override

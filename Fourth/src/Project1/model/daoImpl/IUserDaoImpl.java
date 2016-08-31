@@ -81,54 +81,54 @@ public class IUserDaoImpl {
     }
 
     public void lendBook(int uid) throws SQLException {
+        if (!checkFrozen(uid)) {
+            System.out.println("请输入要借的图书书本id");
+            biid = mScanner.nextInt();
+            mBookInfo.setId(biid);
+            title = "bookinfo";
+            title_id = "id";
+            if (checkid(biid, title_id, title) && checkbiid(biid)) {
+                sql = "insert into lendrecord (uid,biid,bid,lendTime,returnTime) values (?,?,?,?,?)";
 
-        System.out.println("请输入要借的图书书本id");
-        biid = mScanner.nextInt();
-        mBookInfo.setId(biid);
-        title = "bookinfo";
-        title_id = "id";
-        if(!checkFrozen(uid)){
-        if (checkid(biid, title_id, title)) {
-
-            sql = "insert into lendrecord (uid,biid,lendTime,returnTime) values (?,?,?,?)";
-
-            try {
                 mPreparedStatement = mConnection.prepareStatement(sql);
                 mPreparedStatement.setInt(1, uid);
                 mPreparedStatement.setInt(2, mBookInfo.getId());
-                mPreparedStatement.setString(3, GetTime.getInstance().getCurrTime());
-                mPreparedStatement.setString(4, GetTime.getInstance().getAfterTime());
+                mPreparedStatement.setInt(3, mBookInfo.getBid());
+                mPreparedStatement.setString(4, GetTime.getInstance().getCurrTime());
+                mPreparedStatement.setString(5, GetTime.getInstance().getAfterTime());
                 resultCode = mPreparedStatement.executeUpdate();
-
-
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
+            if (resultCode > 0)
+                System.out.println("借书成功");
+            else
+                System.out.println("借书失败");
 
-        } if (resultCode > 0)
-            System.out.println("借书成功");
-        else
-            System.out.println("借书失败");
-        }else
+        } else
             System.out.println("帐号被冻结，不能借书");
+
+
     }
 
 
-    public void returnBook() throws SQLException {
+    public void returnBook() {
         System.out.println("请输入所还书书本的id号：");
         biid = mScanner.nextInt();
         title = "lendrecord";
         title_id = "biid";
-        if (checkid(bid, title_id, title)) {
-            sql = "update lendrecord set returnTime=? where biid=?";
-            mPreparedStatement = mConnection.prepareStatement(sql);
-            mPreparedStatement.setString(1, GetTime.getInstance().getCurrTime());
-            mPreparedStatement.setInt(2, biid);
-            resultCode = mPreparedStatement.executeUpdate();
-            if (resultCode > 0)
-                System.out.println("还书成功");
-        } else
-            System.out.println("还书失败");
+        try {
+            if (checkid(biid, title_id, title)) {
+                sql = "update lendrecord set returnTime=? where biid=?";
+                mPreparedStatement = mConnection.prepareStatement(sql);
+                mPreparedStatement.setString(1, GetTime.getInstance().getCurrTime());
+                mPreparedStatement.setInt(2, biid);
+                resultCode = mPreparedStatement.executeUpdate();
+                if (resultCode > 0)
+                    System.out.println("还书成功");
+            } else
+                System.out.println("还书失败");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -181,6 +181,28 @@ public class IUserDaoImpl {
             System.out.println("查不到你所输入的图书书表信息");
     }
 
+    public boolean checkbiid(int biid) {
+        sql = "select * from bookinfo where id=?";
+
+        try {
+            mPreparedStatement = mConnection.prepareStatement(sql);
+            mPreparedStatement.setInt(1, biid);
+            mResultSet = mPreparedStatement.executeQuery();
+            if (mResultSet.next()) {
+                mBookInfo = new BookInfo(mResultSet.getInt("id"), mResultSet.getInt("bid"),
+                        mResultSet.getInt("inout"), mResultSet.getInt("state"), mResultSet.getInt("lost"));
+
+            }
+            if (mBookInfo.getInout() == 0)
+                resultCode = 0;
+            else if (mBookInfo.getInout() == 1)
+                resultCode = 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return resultCode > 0;
+    }
+
     public boolean checkid(int bid, String str1, String str2) throws SQLException {
         sql = "select id from book where id=?";
         sql = sql.replace("id", str1);
@@ -201,27 +223,35 @@ public class IUserDaoImpl {
         System.out.println("*2* 查看个人借还书记录");
         System.out.println("*3* 查看书本评价信息");
         System.out.println("*4* 修改登录密码");
-
+        System.out.println("*5* 返回用户主界面");
         int choose = mScanner.nextInt();
         switch (choose) {
             case 1:
                 sql = "select id,name,level from user where id=?";
                 sql = sql.replace("?", "" + useId);
                 showUser(sql);
+                showInfo(useId);
                 break;
             case 2:
-                sql = "select id, uid, biid, lendTime, returnTime from lendrecord where id=?";
+                sql = "select id, uid, biid,bid, lendTime, returnTime from lendrecord where uid=?";
                 sql = sql.replace("?", "" + useId);
                 showLendRecord(sql);
+                showInfo(useId);
                 break;
             case 3:
                 sql = "select id, uid, bid, content, conTime from evaluaterecord";
                 showEvaluate(sql);
+                showInfo(useId);
                 break;
             case 4:
                 updatePwd(useId);
+                showInfo(useId);
+                break;
+            case 5:
                 break;
             default:
+                System.out.println("输入指令错误，请重新输入");
+                showInfo(useId);
                 break;
         }
 
@@ -236,23 +266,24 @@ public class IUserDaoImpl {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if(mResultSet==null)
+        if (mResultSet == null)
             System.out.println("没有记录");
         try {
             while (mResultSet.next()) {
 
-
+               List<User> userList=new ArrayList<>();
                 mUser.setId(mResultSet.getInt("id"));
                 mUser.setName(mResultSet.getString("name"));
                 mUser.setLevel(mResultSet.getInt("level"));
                 userList.add(mUser);
+                for (User user : userList)
+                    System.out.println(user);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        for (User user : userList) {
-            System.out.println(user);
-        }
+
+
     }
 
 
@@ -263,22 +294,25 @@ public class IUserDaoImpl {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if(mResultSet==null)
+        if (mResultSet == null)
             System.out.println("没有记录");
         try {
-           if (mResultSet.next()) {
+            while (mResultSet.next()) {
+                List<LendRecord> lendRecordList=new ArrayList<>();
                 mLendRecord.setId(mResultSet.getInt("id"));
                 mLendRecord.setUid(mResultSet.getInt("uid"));
                 mLendRecord.setBiid(mResultSet.getInt("biid"));
+                mLendRecord.setBiid(mResultSet.getInt("bid"));
                 mLendRecord.setLendTime(mResultSet.getString("lendTime"));
                 mLendRecord.setReturnTime(mResultSet.getString("returnTime"));
                 lendRecordList.add(mLendRecord);
+                for (LendRecord lendRecord : lendRecordList)
+                    System.out.println(lendRecord);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        for (LendRecord lendRecord : lendRecordList)
-            System.out.println(lendRecord);
+
     }
 
     public void showEvaluate(String sql) {
@@ -288,24 +322,26 @@ public class IUserDaoImpl {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if(mResultSet==null)
+        if (mResultSet == null)
             System.out.println("没有此记录");
         try {
             while (mResultSet.next()) {
-                EvaluateRecord evaluate=new EvaluateRecord();
-                evaluate.setId(mResultSet.getInt("id"));
-                evaluate.setUid(mResultSet.getInt("uid"));
-                evaluate.setBid(mResultSet.getInt("bid"));
-                evaluate.setContent(mResultSet.getString("content"));
-                evaluate.setConTime(mResultSet.getString("conTime"));
-                evaluateRecordList.add(evaluate);
+                List<EvaluateRecord> evaluateRecordList=new ArrayList<>();
+
+                mEvaluateRecord.setId(mResultSet.getInt("id"));
+                mEvaluateRecord.setUid(mResultSet.getInt("uid"));
+                mEvaluateRecord.setBid(mResultSet.getInt("bid"));
+                mEvaluateRecord.setContent(mResultSet.getString("content"));
+                mEvaluateRecord.setConTime(mResultSet.getString("conTime"));
+                evaluateRecordList.add( mEvaluateRecord);
+                for (EvaluateRecord evaluateRecord : evaluateRecordList)
+                    System.out.println(evaluateRecord);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        for (EvaluateRecord evaluateRecord : evaluateRecordList)
-            System.out.println(evaluateRecord);
+
     }
 
     public void updatePwd(int useId) {

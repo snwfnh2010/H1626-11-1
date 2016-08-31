@@ -49,22 +49,28 @@ public class LibSystem {
 
         switch (choose){
             case 1:
-                bookList=mVisitorDao.showBooks();
-                if(bookList==null)
-                    System.out.println("没有图书");
-                for(Book book:bookList)
-                    System.out.println(book);
+                mVisitorDao.showBooks();
                 init();
                 break;
             case 2:
 
                 mUser=mVisitorDao.login();
-                if(mUser.getLevel()==1)
-                    manage();
-                if(mUser.getLevel()==0)
-                    user();
-                else
-                    init();
+                if(mUser!=null){
+                    switch (mUser.getLevel()){
+                        case 0:
+                            user();
+                            break;
+                        case 1:
+                           manage();;
+                            break;
+                        default:
+                            break;
+
+                    }
+
+
+                }else
+                init();
                 break;
             case 3:
                 break;
@@ -95,11 +101,7 @@ public class LibSystem {
         int choose=mScanner.nextInt();
         switch (choose){
             case 1:
-                bookList=mVisitorDao.showBooks();
-                if(bookList==null)
-                    System.out.println("没有图书");
-                for(Book book:bookList)
-                    System.out.println(book);
+                mVisitorDao.showBooks();
                 user();
                 break;
             case 2:
